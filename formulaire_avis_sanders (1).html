@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laissez votre avis – Sanders</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #0f1c2e 0%, #1a2f4a 50%, #0d2238 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 3rem 2.5rem 2.5rem;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+  }
+  .brand {
+    text-align: center;
+    margin-bottom: 1.8rem;
+  }
+  .brand-icon {
+    width: 56px;
+    height: 56px;
+    background: #0f1c2e;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+  }
+  .brand-icon svg { width: 28px; height: 28px; fill: #fbbf24; }
+  .brand h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0f1c2e;
+    margin-bottom: 0.25rem;
+  }
+  .brand p.sub {
+    font-size: 0.8rem;
+    color: #6b7280;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .welcome-box {
+    background: #f8faff;
+    border: 1px solid #e0e9ff;
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .welcome-box p {
+    font-size: 0.95rem;
+    color: #374151;
+    line-height: 1.65;
+  }
+  .welcome-box strong {
+    color: #0f1c2e;
+    font-weight: 500;
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #6b7280;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+
+  .star-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .star-row .star {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    font-size: 2.2rem;
+    color: #d1d5db;
+    line-height: 1;
+    user-select: none;
+  }
+  .star-row .star.active { color: #f59e0b; }
+  .star-row .star:hover { transform: scale(1.2); color: #f59e0b; }
+
+  .rating-label {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-top: -1.2rem;
+    margin-bottom: 1.8rem;
+    height: 1.2em;
+    font-style: italic;
+  }
+
+  .field {
+    margin-bottom: 1.4rem;
+  }
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: #1f2937;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    resize: none;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder { color: #9ca3af; }
+  .field input:focus,
+  .field textarea:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.12);
+  }
+  .field textarea { min-height: 130px; line-height: 1.6; }
+
+  .btn-send {
+    width: 100%;
+    padding: 0.95rem;
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.02em;
+  }
+  .btn-send:hover { background: #15803d; }
+  .btn-send:active { transform: scale(0.98); }
+  .btn-send:disabled { background: #6b7280; cursor: not-allowed; }
+  .btn-send svg {
+    width: 18px; height: 18px;
+    fill: none; stroke: #fff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .success-msg {
+    display: none;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    margin-top: 1rem;
+  }
+  .success-msg .big-check { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .success-msg p { color: #15803d; font-weight: 500; font-size: 0.95rem; }
+
+  .star-center-wrap { text-align: center; margin-bottom: 0.3rem; }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- En-tête marque -->
+  <div class="brand">
+    <div class="brand-icon">
+      <!-- Icône "S" stylisée -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <text x="4" y="19" font-size="18" font-weight="700" fill="#fbbf24" font-family="Georgia, serif">S</text>
+      </svg>
+    </div>
+    <h1>Sanders</h1>
+    <p class="sub">Services digitaux &amp; Web</p>
+  </div>
+
+  <!-- Message d'accueil -->
+  <div class="welcome-box">
+    <p>👋 Merci de me faire confiance !<br>
+    <strong>Votre avis compte énormément.</strong><br>
+    Prenez quelques secondes pour noter mon service et partager votre expérience — ça m'aide à m'améliorer et à aider d'autres clients comme vous.</p>
+  </div>
+
+  <!-- Étoiles -->
+  <div class="star-center-wrap">
+    <span class="section-label">Votre note</span>
+  </div>
+  <div class="star-row" id="stars">
+    <span class="star" data-val="1">★</span>
+    <span class="star" data-val="2">★</span>
+    <span class="star" data-val="3">★</span>
+    <span class="star" data-val="4">★</span>
+    <span class="star" data-val="5">★</span>
+  </div>
+  <div class="rating-label" id="ratingLabel">Cliquez sur une étoile pour noter</div>
+
+  <!-- Nom -->
+  <div class="field">
+    <span class="section-label">Votre prénom / nom</span>
+    <input type="text" id="clientName" placeholder="Ex : Marie Kodjovi" autocomplete="name" />
+  </div>
+
+  <!-- Témoignage -->
+  <div class="field">
+    <span class="section-label">Votre témoignage</span>
+    <textarea id="clientMsg" placeholder="Partagez votre expérience avec mes services..."></textarea>
+  </div>
+
+  <!-- Bouton envoi -->
+  <button class="btn-send" id="sendBtn" onclick="sendAvis()">
+    <svg viewBox="0 0 24 24">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+    Envoyer mon avis
+  </button>
+
+  <!-- Message succès -->
+  <div class="success-msg" id="successMsg">
+    <div class="big-check">🎉</div>
+    <p>Merci beaucoup ! Votre témoignage a bien été reçu.<br>Je vous en suis vraiment reconnaissant.</p>
+  </div>
+
+</div>
+
+<script>
+  // =============================================
+  // REMPLACE CES 3 VALEURS PAR TES IDENTIFIANTS EMAILJS
+  // =============================================
+  const EMAILJS_PUBLIC_KEY  = "YOUR_PUBLIC_KEY";   // Account → API Keys
+  const EMAILJS_SERVICE_ID  = "YOUR_SERVICE_ID";   // Email Services
+  const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";  // Email Templates
+  // =============================================
+
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  let rating = 0;
+  const labels = ['', 'Pas satisfait 😕', 'Peut mieux faire 😐', 'Bien 🙂', 'Très bien 😊', 'Excellent ! 🌟'];
+  const stars = document.querySelectorAll('.star');
+  const ratingLabel = document.getElementById('ratingLabel');
+
+  stars.forEach(s => {
+    s.addEventListener('click', () => {
+      rating = parseInt(s.dataset.val);
+      stars.forEach(st => st.classList.toggle('active', parseInt(st.dataset.val) <= rating));
+      ratingLabel.textContent = labels[rating];
+      ratingLabel.style.color = '#f59e0b';
+    });
+    s.addEventListener('mouseover', () => {
+      const hov = parseInt(s.dataset.val);
+      stars.forEach(st => {
+        st.style.color = parseInt(st.dataset.val) <= hov ? '#f59e0b' : (parseInt(st.dataset.val) <= rating ? '#f59e0b' : '#d1d5db');
+      });
+    });
+    s.addEventListener('mouseout', () => {
+      stars.forEach(st => {
+        st.style.color = parseInt(st.dataset.val) <= rating ? '#f59e0b' : '#d1d5db';
+      });
+    });
+  });
+
+  function starsString(n) {
+    return '★'.repeat(n) + '☆'.repeat(5 - n);
+  }
+
+  function sendAvis() {
+    const name = document.getElementById('clientName').value.trim();
+    const msg  = document.getElementById('clientMsg').value.trim();
+    const btn  = document.getElementById('sendBtn');
+
+    if (!name)   { alert('Veuillez entrer votre nom.'); return; }
+    if (!rating) { alert('Veuillez choisir une note.'); return; }
+    if (!msg)    { alert('Veuillez écrire votre témoignage.'); return; }
+
+    btn.disabled    = true;
+    btn.textContent = 'Envoi en cours...';
+
+    const templateParams = {
+      client_name   : name,
+      rating        : rating + '/5',
+      stars_display : starsString(rating),
+      message       : msg,
+      to_email      : 'sandersjob030@gmail.com'
+    };
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+      .then(() => {
+        document.getElementById('sendBtn').style.display = 'none';
+        document.getElementById('successMsg').style.display = 'block';
+      })
+      .catch(err => {
+        alert('Erreur lors de l\'envoi. Veuillez réessayer.');
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Envoyer mon avis`;
+        console.error('EmailJS error:', err);
+      });
+  }
+</script>
+</body>
+</html>
